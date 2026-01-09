@@ -1,0 +1,326 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    color: white;
+    min-height: 100vh;
+    padding-bottom: 70px;
+}
+
+.screen {
+    display: none;
+    padding: 15px;
+}
+
+.screen.active {
+    display: block;
+}
+
+/* Шапка с балансом */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-info img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #00c6ff;
+}
+
+.balance {
+    text-align: right;
+}
+
+.balance-title {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.balance-amount {
+    font-size: 28px;
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+.currency {
+    color: #FFD700;
+}
+
+.btn-small {
+    background: linear-gradient(90deg, #00c6ff, #0072ff);
+    border: none;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Игровая область */
+.game-area {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.rocket-container {
+    position: relative;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.rocket {
+    font-size: 60px;
+    transition: transform 0.1s linear;
+    transform: translateY(0);
+}
+
+.multiplier-display {
+    font-size: 24px;
+    margin-top: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px 20px;
+    border-radius: 10px;
+}
+
+#crashChart {
+    width: 100%;
+    height: 100px;
+    margin-top: 10px;
+}
+
+/* Секция ставок */
+.bet-section {
+    margin-top: 20px;
+}
+
+.bet-input-group {
+    margin-bottom: 15px;
+}
+
+#betAmount {
+    width: 100%;
+    padding: 15px;
+    border-radius: 10px;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 18px;
+    text-align: center;
+}
+
+.quick-bets {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.btn-chip {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid #00c6ff;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.auto-cashout {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.auto-cashout input {
+    width: 80px;
+    padding: 8px;
+    border-radius: 5px;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    text-align: center;
+}
+
+.btn-bet {
+    width: 100%;
+    padding: 20px;
+    background: linear-gradient(90deg, #00b09b, #96c93d);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+.active-bet {
+    background: rgba(0, 255, 0, 0.1);
+    padding: 15px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.btn-cashout {
+    background: linear-gradient(90deg, #ff416c, #ff4b2b);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+/* История */
+.history {
+    margin-top: 20px;
+}
+
+.history ul {
+    list-style: none;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+}
+
+.history li {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-radius: 10px;
+    min-width: 60px;
+    text-align: center;
+}
+
+/* Нижнее меню */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 15px;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+}
+
+.nav-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.nav-btn.active {
+    background: rgba(0, 198, 255, 0.3);
+}
+
+/* Пополнение */
+.deposit-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.deposit-option {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.deposit-option:hover {
+    background: rgba(0, 198, 255, 0.3);
+}
+
+.stars {
+    font-size: 24px;
+    font-weight: bold;
+    color: #FFD700;
+}
+
+.price {
+    font-size: 14px;
+    opacity: 0.7;
+    margin-top: 5px;
+}
+
+.note {
+    text-align: center;
+    margin-top: 20px;
+    opacity: 0.7;
+}
+
+/* Профиль */
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin: 20px auto;
+    display: block;
+    border: 3px solid #00c6ff;
+}
+
+.profile-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 30px;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat-label {
+    font-size: 14px;
+    opacity: 0.7;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.btn-back {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
