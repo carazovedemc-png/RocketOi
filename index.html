@@ -3,118 +3,495 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rocket Crash | Игра</title>
+    <title>🚀 Rocket Crash | Telegram Game</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Главный экран (Краш) -->
+    <!-- Главный экран игры -->
     <div id="mainScreen" class="screen active">
         <header class="header">
-            <div class="user-info" id="userInfo">
-                <!-- Сюда вставится аватар и ник из Telegram -->
-                <img id="userAvatar" src="" alt="Аватар">
-                <span id="userName">Загрузка...</span>
-            </div>
-            <div class="balance">
-                <div class="balance-title">Ваш баланс</div>
-                <div class="balance-amount">
-                    <span id="balance">0.00</span> <span class="currency">★</span>
+            <div class="user-header">
+                <div class="user-avatar" id="userAvatar">👤</div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">Игрок</div>
+                    <div class="user-id">ID: <span id="userId">0000</span></div>
                 </div>
-                <button class="btn-small" onclick="showDeposit()">Пополнить</button>
+            </div>
+            <div class="balance-card">
+                <div class="balance-label">Ваш баланс</div>
+                <div class="balance-amount">
+                    <i class="fas fa-star"></i>
+                    <span id="balance">50.00</span>
+                </div>
+                <button class="btn-deposit" onclick="showScreen('deposit')">
+                    <i class="fas fa-plus"></i>
+                </button>
             </div>
         </header>
 
-        <main class="game-area">
-            <div class="rocket-container">
-                <div class="rocket" id="rocket">🚀</div>
-                <div class="multiplier-display">
-                    Множитель: <span id="currentMultiplier">1.00x</span>
+        <main class="game-container">
+            <!-- Игровое поле с космическим фоном -->
+            <div class="game-area">
+                <div class="space-background">
+                    <div class="stars"></div>
+                    <div class="stars small"></div>
                 </div>
-                <canvas id="crashChart" width="300" height="100"></canvas>
-            </div>
-
-            <div class="bet-section">
-                <div class="bet-input-group">
-                    <input type="number" id="betAmount" min="0.2" step="0.2" value="0.20" placeholder="Сумма ставки">
-                    <div class="quick-bets">
-                        <button class="btn-chip" onclick="setBet(0.20)">0.20</button>
-                        <button class="btn-chip" onclick="setBet(0.50)">0.50</button>
-                        <button class="btn-chip" onclick="setBet(1)">1</button>
-                        <button class="btn-chip" onclick="setBet(5)">5</button>
+                
+                <div class="rocket-display">
+                    <div class="multiplier-display">
+                        <div class="multiplier-label">МНОЖИТЕЛЬ</div>
+                        <div class="multiplier-value" id="currentMultiplier">1.00x</div>
+                    </div>
+                    
+                    <div class="rocket-wrapper">
+                        <div class="rocket" id="rocket">🚀</div>
+                        <div class="flame"></div>
+                    </div>
+                    
+                    <div class="crash-point" id="crashPoint">Краш: <span>?</span>x</div>
+                </div>
+                
+                <div class="game-stats">
+                    <div class="stat">
+                        <div class="stat-label">Ставка</div>
+                        <div class="stat-value"><i class="fas fa-star"></i> <span id="currentBetAmount">0.20</span></div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Автовывод</div>
+                        <div class="stat-value"><span id="autoCashoutValue">2.00</span>x</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Выигрыш</div>
+                        <div class="stat-value"><i class="fas fa-star"></i> <span id="potentialWin">0.40</span></div>
                     </div>
                 </div>
+            </div>
 
-                <div class="auto-cashout">
-                    <label>Авто-вывод:</label>
-                    <input type="number" id="autoCashout" min="1.1" step="0.1" value="2.00" placeholder="2.00x">
+            <!-- Панель управления ставками -->
+            <div class="bet-controls">
+                <div class="bet-amount">
+                    <div class="input-group">
+                        <button class="btn-minus" onclick="changeBet(-0.10)">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <div class="bet-input">
+                            <i class="fas fa-star"></i>
+                            <input type="number" id="betAmount" value="0.20" min="0.10" step="0.10" onchange="updateBet()">
+                        </div>
+                        <button class="btn-plus" onclick="changeBet(0.10)">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="quick-bets">
+                        <button class="chip" onclick="setBetAmount(0.20)">0.20</button>
+                        <button class="chip" onclick="setBetAmount(0.50)">0.50</button>
+                        <button class="chip" onclick="setBetAmount(1.00)">1.00</button>
+                        <button class="chip" onclick="setBetAmount(5.00)">5.00</button>
+                        <button class="chip" onclick="setBetAmount(10.00)">10.00</button>
+                    </div>
                 </div>
-
-                <button class="btn-bet" id="placeBetBtn" onclick="placeBet()">
-                    Сделать ставку — <span id="betAmountDisplay">0.20</span> ★
-                </button>
-
-                <div class="active-bet" id="activeBetSection" style="display: none;">
-                    <div>Ваша ставка: <span id="activeBetAmount">0</span> ★</div>
-                    <button class="btn-cashout" onclick="cashOut()">Забрать x<span id="cashoutMultiplier">1.00</span></button>
+                
+                <div class="auto-cashout">
+                    <div class="auto-cashout-label">
+                        <i class="fas fa-robot"></i> Автовывод
+                    </div>
+                    <div class="auto-cashout-input">
+                        <input type="range" id="cashoutSlider" min="1.10" max="10.00" step="0.10" value="2.00" oninput="updateAutoCashout()">
+                        <div class="slider-value" id="cashoutValue">2.00x</div>
+                    </div>
+                    <div class="cashout-presets">
+                        <button class="preset" onclick="setAutoCashout(1.50)">1.50x</button>
+                        <button class="preset" onclick="setAutoCashout(2.00)">2.00x</button>
+                        <button class="preset" onclick="setAutoCashout(3.00)">3.00x</button>
+                        <button class="preset" onclick="setAutoCashout(5.00)">5.00x</button>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn-bet" id="placeBetBtn" onclick="placeBet()">
+                        <i class="fas fa-rocket"></i>
+                        <span>СДЕЛАТЬ СТАВКУ</span>
+                        <div class="bet-summary"><i class="fas fa-star"></i> <span id="displayBetAmount">0.20</span></div>
+                    </button>
+                    
+                    <button class="btn-cashout" id="cashoutBtn" onclick="cashOut()" style="display: none;">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        <span>ЗАБРАТЬ</span>
+                        <div class="cashout-summary"><span id="cashoutMultiplier">1.00</span>x</div>
+                    </button>
                 </div>
             </div>
 
-            <div class="history">
-                <h3>Последние игры:</h3>
-                <ul id="historyList">
+            <!-- История игр -->
+            <div class="game-history">
+                <div class="history-header">
+                    <h3><i class="fas fa-history"></i> История игр</h3>
+                    <div class="online-count">
+                        <i class="fas fa-users"></i> <span id="onlinePlayers">0</span> онлайн
+                    </div>
+                </div>
+                <div class="history-list" id="historyList">
                     <!-- История будет здесь -->
-                </ul>
+                </div>
             </div>
         </main>
-
-        <nav class="bottom-nav">
-            <button class="nav-btn" onclick="switchScreen('top')">🏆 Топ</button>
-            <button class="nav-btn active" onclick="switchScreen('crash')">🚀 Краш</button>
-            <button class="nav-btn" onclick="switchScreen('profile')">👤 Профиль</button>
-        </nav>
     </div>
 
-    <!-- Экран пополнения -->
-    <div id="depositScreen" class="screen">
-        <div class="deposit-header">
-            <button class="btn-back" onclick="showMain()">← Назад</button>
-            <h2>Пополнение баланса</h2>
-        </div>
-        <div class="deposit-options">
-            <div class="deposit-option" onclick="buyStars(10)">
-                <div class="stars">10 ★</div>
-                <div class="price">≈ 100 ₽</div>
-            </div>
-            <div class="deposit-option" onclick="buyStars(50)">
-                <div class="stars">50 ★</div>
-                <div class="price">≈ 500 ₽</div>
-            </div>
-            <div class="deposit-option" onclick="buyStars(100)">
-                <div class="stars">100 ★</div>
-                <div class="price">≈ 1000 ₽</div>
+    <!-- Экран топа -->
+    <div id="topScreen" class="screen">
+        <div class="screen-header">
+            <button class="btn-back" onclick="showScreen('main')">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2><i class="fas fa-trophy"></i> ТОП ИГРОКОВ</h2>
+            <div class="header-actions">
+                <button class="btn-refresh" onclick="loadTopPlayers()">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
             </div>
         </div>
-        <p class="note">★ — Telegram Stars. 1 звезда ≈ 10 ₽</p>
+        
+        <div class="top-container">
+            <div class="top-tabs">
+                <button class="top-tab active" data-period="day">Сегодня</button>
+                <button class="top-tab" data-period="week">Неделя</button>
+                <button class="top-tab" data-period="month">Месяц</button>
+                <button class="top-tab" data-period="all">Все время</button>
+            </div>
+            
+            <div class="top-list" id="topList">
+                <!-- Список топ игроков будет здесь -->
+            </div>
+            
+            <div class="user-top-position">
+                <div class="user-rank">
+                    <div class="rank-label">Ваша позиция</div>
+                    <div class="rank-value">#<span id="userRank">0</span></div>
+                </div>
+                <div class="user-profit">
+                    <div class="profit-label">Ваш выигрыш</div>
+                    <div class="profit-value"><i class="fas fa-star"></i> <span id="userProfit">0.00</span></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Экран профиля -->
     <div id="profileScreen" class="screen">
-        <div class="profile-header">
-            <button class="btn-back" onclick="showMain()">← Назад</button>
-            <h2>Ваш профиль</h2>
+        <div class="screen-header">
+            <button class="btn-back" onclick="showScreen('main')">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2><i class="fas fa-user"></i> ПРОФИЛЬ</h2>
+            <div class="header-actions">
+                <button class="btn-settings" onclick="showSettings()">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
         </div>
-        <div class="profile-content">
-            <img id="profileAvatar" src="" alt="Аватар" class="profile-avatar">
-            <h3 id="profileName"></h3>
-            <div class="profile-stats">
-                <div class="stat">
-                    <div class="stat-label">Всего игр</div>
-                    <div class="stat-value" id="totalGames">0</div>
+        
+        <div class="profile-container">
+            <div class="profile-header">
+                <div class="profile-avatar-large" id="profileAvatarLarge">👤</div>
+                <div class="profile-info">
+                    <h3 id="profileName">Игрок</h3>
+                    <div class="profile-id">ID: <span id="profileId">0000</span></div>
+                    <div class="profile-registration">
+                        <i class="far fa-calendar-alt"></i> Зарегистрирован: <span id="regDate">01.01.2024</span>
+                    </div>
                 </div>
-                <div class="stat">
-                    <div class="stat-label">Выиграно</div>
-                    <div class="stat-value" id="totalWon">0 ★</div>
+            </div>
+            
+            <div class="profile-balance">
+                <div class="balance-stats">
+                    <div class="balance-stat">
+                        <div class="stat-label">Баланс</div>
+                        <div class="stat-value"><i class="fas fa-star"></i> <span id="profileBalance">50.00</span></div>
+                    </div>
+                    <div class="balance-stat">
+                        <div class="stat-label">Всего пополнено</div>
+                        <div class="stat-value"><i class="fas fa-star"></i> <span id="totalDeposited">50.00</span></div>
+                    </div>
+                    <div class="balance-stat">
+                        <div class="stat-label">Всего выведено</div>
+                        <div class="stat-value"><i class="fas fa-star"></i> <span id="totalWithdrawn">0.00</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="profile-stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Всего игр</div>
+                        <div class="stat-value" id="totalGames">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Выиграно</div>
+                        <div class="stat-value"><i class="fas fa-star"></i> <span id="totalWon">0.00</span></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Win Rate</div>
+                        <div class="stat-value" id="winRate">0%</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Рекорд</div>
+                        <div class="stat-value" id="recordMultiplier">0.00x</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="profile-actions">
+                <button class="profile-action-btn" onclick="showScreen('deposit')">
+                    <div class="action-icon">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <div class="action-text">
+                        <div class="action-title">Пополнить</div>
+                        <div class="action-subtitle">Баланс звездами</div>
+                    </div>
+                    <div class="action-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </button>
+                
+                <button class="profile-action-btn" onclick="showInventory()">
+                    <div class="action-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="action-text">
+                        <div class="action-title">Инвентарь</div>
+                        <div class="action-subtitle">Предметы и бонусы</div>
+                    </div>
+                    <div class="inventory-count">0</div>
+                    <div class="action-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </button>
+                
+                <button class="profile-action-btn" onclick="showRewards()">
+                    <div class="action-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <div class="action-text">
+                        <div class="action-title">Награды</div>
+                        <div class="action-subtitle">Ежедневные бонусы</div>
+                    </div>
+                    <div class="action-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </button>
+                
+                <button class="profile-action-btn" onclick="showWithdraw()">
+                    <div class="action-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="action-text">
+                        <div class="action-title">Вывести</div>
+                        <div class="action-subtitle">Звезды в рубли</div>
+                    </div>
+                    <div class="action-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </button>
+                
+                <button class="profile-action-btn" onclick="showReferrals()">
+                    <div class="action-icon">
+                        <i class="fas fa-user-friends"></i>
+                    </div>
+                    <div class="action-text">
+                        <div class="action-title">Рефералы</div>
+                        <div class="action-subtitle">Пригласи друзей</div>
+                    </div>
+                    <div class="action-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </button>
+                
+                <button class="profile-action-btn" onclick="showTransactions()">
+                    <div class="action-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <div class="action-text">
+                        <div class="action-title">История операций</div>
+                        <div class="action-subtitle">Все пополнения и выводы</div>
+                    </div>
+                    <div class="action-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Экран пополнения -->
+    <div id="depositScreen" class="screen">
+        <div class="screen-header">
+            <button class="btn-back" onclick="showScreen('main')">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2><i class="fas fa-star"></i> ПОПОЛНЕНИЕ БАЛАНСА</h2>
+        </div>
+        
+        <div class="deposit-container">
+            <div class="deposit-info">
+                <div class="info-card">
+                    <i class="fas fa-info-circle"></i>
+                    <p>1 звезда = 10 ₽. Пополнение через Telegram Stars</p>
+                </div>
+            </div>
+            
+            <div class="deposit-amount">
+                <h3>Выберите сумму</h3>
+                <div class="amount-input">
+                    <i class="fas fa-star"></i>
+                    <input type="number" id="depositStars" value="10" min="10" step="10" onchange="updateDepositAmount()">
+                    <div class="amount-label">звёзд</div>
+                </div>
+                <div class="amount-rub">≈ <span id="depositRub">100</span> ₽</div>
+                
+                <div class="amount-presets">
+                    <button class="amount-preset" data-amount="10" onclick="setDepositAmount(10)">
+                        <div class="preset-stars">10 ★</div>
+                        <div class="preset-rub">100 ₽</div>
+                    </button>
+                    <button class="amount-preset" data-amount="50" onclick="setDepositAmount(50)">
+                        <div class="preset-stars">50 ★</div>
+                        <div class="preset-rub">500 ₽</div>
+                    </button>
+                    <button class="amount-preset" data-amount="100" onclick="setDepositAmount(100)">
+                        <div class="preset-stars">100 ★</div>
+                        <div class="preset-rub">1000 ₽</div>
+                    </button>
+                    <button class="amount-preset" data-amount="200" onclick="setDepositAmount(200)">
+                        <div class="preset-stars">200 ★</div>
+                        <div class="preset-rub">2000 ₽</div>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="payment-methods">
+                <h3>Способ оплаты</h3>
+                <div class="method-selector">
+                    <div class="method active" id="telegramStars">
+                        <div class="method-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="method-info">
+                            <div class="method-name">Telegram Stars</div>
+                            <div class="method-desc">Баланс Telegram</div>
+                        </div>
+                        <div class="method-check">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn-pay" onclick="processPayment()">
+                <i class="fas fa-lock"></i>
+                <span>ОПЛАТИТЬ</span>
+                <div class="pay-amount"><i class="fas fa-star"></i> <span id="payStars">10</span> ★</div>
+            </button>
+            
+            <div class="deposit-history">
+                <h4>Последние пополнения</h4>
+                <div class="history-items" id="depositHistory">
+                    <!-- История пополнений -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Нижняя навигационная панель -->
+    <nav class="bottom-nav">
+        <div class="nav-container">
+            <button class="nav-item" onclick="showScreen('top')">
+                <div class="nav-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="nav-label">Топ</div>
+            </button>
+            
+            <div class="nav-divider"></div>
+            
+            <button class="nav-item active" onclick="showScreen('main')">
+                <div class="nav-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <div class="nav-label">Краш</div>
+            </button>
+            
+            <div class="nav-divider"></div>
+            
+            <button class="nav-item" onclick="showScreen('profile')">
+                <div class="nav-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="nav-label">Профиль</div>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Всплывающие уведомления -->
+    <div id="notification" class="notification">
+        <div class="notification-content">
+            <div class="notification-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="notification-text">Успешно!</div>
+        </div>
+    </div>
+
+    <!-- Модальное окно оплаты -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-shopping-cart"></i> Оформление заказа</h3>
+                <button class="modal-close" onclick="closePaymentModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="payment-summary">
+                    <div class="payment-item">
+                        <div class="payment-label">Товар</div>
+                        <div class="payment-value">Telegram Stars</div>
+                    </div>
+                    <div class="payment-item">
+                        <div class="payment-label">Количество</div>
+                        <div class="payment-value"><i class="fas fa-star"></i> <span id="modalStars">10</span> ★</div>
+                    </div>
+                    <div class="payment-item">
+                        <div class="payment-label">Сумма</div>
+                        <div class="payment-value"><span id="modalRub">100</span> ₽</div>
+                    </div>
+                </div>
+                <div class="payment-processing">
+                    <div class="processing-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                    <p>Ожидание подтверждения платежа...</p>
                 </div>
             </div>
         </div>
