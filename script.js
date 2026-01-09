@@ -1,37 +1,77 @@
-// Инициализация Telegram Mini App
+// ===== ОСНОВНЫЕ ИСПРАВЛЕНИЯ =====
 const tg = window.Telegram.WebApp;
 
-// Инициализация приложения
+// Инициализация приложения с исправлениями
 function initTelegramApp() {
-    // Расширяем на весь экран
+    // Полноэкранный режим
     tg.expand();
-    
-    // Включаем подтверждение закрытия
     tg.enableClosingConfirmation();
     
-    // Показываем кнопку "Назад"
-    tg.BackButton.show();
+    // Настройка кнопки "Назад" Telegram
     tg.BackButton.onClick(() => {
         const activeScreen = document.querySelector('.screen.active').id;
-        if (activeScreen !== 'mainScreen') {
-            showScreen('main');
-        } else {
-            tg.close();
+        switch(activeScreen) {
+            case 'mainScreen':
+                tg.close();
+                break;
+            case 'topScreen':
+            case 'profileScreen':
+            case 'depositScreen':
+                showScreen('main');
+                break;
         }
     });
     
-    // Инициализируем пользователя
+    // Запрет скроллинга на iOS
+    document.addEventListener('touchmove', function(e) {
+        // Разрешаем скролл только в определенных элементах
+        const allowedScrollElements = document.querySelectorAll('.screen-content');
+        let canScroll = false;
+        
+        allowedScrollElements.forEach(element => {
+            if (element.contains(e.target)) {
+                canScroll = true;
+            }
+        });
+        
+        if (!canScroll) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+    }, { passive: false });
+    
+    // Запрет горизонтального скролла
+    document.addEventListener('wheel', function(e) {
+        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+    
+    // Инициализация пользователя
     initUser();
     
-    // Загружаем данные
+    // Загрузка данных
     loadGameData();
     loadTopPlayers();
     updateOnlinePlayers();
     
-    // Обновляем онлайн игроков каждые 30 секунд
+    // Обновление онлайн игроков
     setInterval(updateOnlinePlayers, 30000);
     
-    console.log('Telegram Mini App инициализирован');
+    // Применение CSS запретов скроллинга
+    applyScrollLock();
+}
+
+// Применение запретов скроллинга
+function applyScrollLock() {
+    // Добавляем классы для запрета скроллинга
+    document.body.classList.add('no-scroll');
+    
+    // Для iOS
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    document.body.style.height = '100%';
 }
 
 // Данные пользователя
@@ -45,7 +85,7 @@ let userData = {
     totalWithdrawn: 0,
     winRate: 0,
     recordMultiplier: 0,
-    registrationDate: '01.01.2024'
+    registrationDate: new Date().toLocaleDateString('ru-RU')
 };
 
 // Игровые данные
@@ -62,44 +102,345 @@ let gameState = {
     onlinePlayers: 0
 };
 
-// Инициализация пользователя
+// Инициализация пользователя с исправлениями
 function initUser() {
     if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
         const tgUser = tg.initDataUnsafe.user;
         userData.id = tgUser.id;
         userData.name = tgUser.first_name || 'Игрок';
         
-        // Устанавливаем аватар
+        // Исправление аватара
         if (tgUser.photo_url) {
-            document.getElementById('userAvatar').innerHTML = `<img src="${tgUser.photo_url}" alt="Avatar">`;
-            document.getElementById('profileAvatarLarge').innerHTML = `<img src="${tgUser.photo_url}" alt="Avatar">`;
+            const avatarImg = `<img src="${tgUser.photo_url}" alt="Avatar" class="no-drag" onerror="this.style.display='none'; this.parentElement.innerHTML='👤';">`;
+            document.getElementById('userAvatar').innerHTML = avatarImg;
+            document.getElementById('profileAvatarLarge').innerHTML = avatarImg;
+        } else {
+            document.getElementById('userAvatar').innerHTML = '👤';
+            document.getElementById('profileAvatarLarge').innerHTML = '👤';
         }
     }
     
-    // Обновляем отображение
+    // Обновление отображения
     document.getElementById('userName').textContent = userData.name;
     document.getElementById('userId').textContent = userData.id ? userData.id.toString().slice(-4) : '0000';
     document.getElementById('profileName').textContent = userData.name;
     document.getElementById('profileId').textContent = userData.id ? userData.id.toString().slice(-4) : '0000';
-    document.getElementById('profileBalance').textContent = userData.balance.toFixed(2);
-    document.getElementById('totalDeposited').textContent = userData.totalDeposited.toFixed(2);
-    document.getElementById('totalWithdrawn').textContent = userData.totalWithdrawn.toFixed(2);
+    document.getElementById('miniBalance').textContent = userData.balance.toFixed(2);
+    updateUserStats();
+}
+
+// Управление экранами с исправлениями
+function showScreen(screenId) {
+    // Скрываем все экраны
+    document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+    });
+    
+    // Обновляем активную кнопку в навигации
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // Управление кнопкой "Назад" Telegram
+    switch(screenId) {
+        case 'main':
+            tg.BackButton.hide();
+            document.querySelectorAll('.nav-item')[1].classList.add('active');
+            break;
+        case 'top':
+            tg.BackButton.show();
+            document.querySelectorAll('.nav-item')[0].classList.add('active');
+            break;
+        case 'profile':
+            tg.BackButton.show();
+            document.querySelectorAll('.nav-item')[2].classList.add('active');
+            break;
+        case 'deposit':
+            tg.BackButton.show();
+            break;
+    }
+    
+    // Показываем выбранный экран
+    let screenElement;
+    switch(screenId) {
+        case 'main':
+            screenElement = document.getElementById('mainScreen');
+            break;
+        case 'top':
+            screenElement = document.getElementById('topScreen');
+            break;
+        case 'profile':
+            screenElement = document.getElementById('profileScreen');
+            break;
+        case 'deposit':
+            screenElement = document.getElementById('depositScreen');
+            break;
+        default:
+            screenElement = document.getElementById('mainScreen');
+    }
+    
+    if (screenElement) {
+        screenElement.classList.add('active');
+        // Прокручиваем в начало
+        const content = screenElement.querySelector('.screen-content');
+        if (content) {
+            content.scrollTop = 0;
+        }
+    }
+}
+
+// ===== НОВАЯ АНИМАЦИЯ РАКЕТКИ =====
+let rocketAnimationInterval = null;
+
+function startGameAnimation() {
+    const rocket = document.getElementById('rocket');
+    const fire = document.getElementById('rocketFire');
+    const multiplierDisplay = document.getElementById('currentMultiplier');
+    const cashoutMultiplier = document.getElementById('cashoutMultiplier');
+    const crashPointElement = document.getElementById('crashPoint');
+    
+    // Сброс состояния
+    rocket.style.transform = 'translateY(0) rotate(0deg)';
+    rocket.classList.remove('rocket-flying', 'rocket-exploding');
+    fire.style.display = 'none';
+    
+    // Показываем точку краша
+    crashPointElement.style.display = 'block';
+    crashPointElement.querySelector('span').textContent = gameState.crashPoint.toFixed(2);
+    
+    let currentMultiplier = 1.00;
+    let animationStep = 0;
+    
+    // Запускаем анимацию
+    rocket.classList.add('rocket-flying');
+    fire.style.display = 'block';
+    
+    // Очищаем предыдущий интервал
+    if (rocketAnimationInterval) {
+        clearInterval(rocketAnimationInterval);
+    }
+    
+    rocketAnimationInterval = setInterval(() => {
+        if (!gameState.isRunning) {
+            clearInterval(rocketAnimationInterval);
+            return;
+        }
+        
+        // Увеличиваем множитель
+        animationStep += 0.02;
+        currentMultiplier = 1 + animationStep;
+        gameState.currentMultiplier = currentMultiplier;
+        
+        // Обновляем отображение
+        multiplierDisplay.textContent = currentMultiplier.toFixed(2) + 'x';
+        cashoutMultiplier.textContent = currentMultiplier.toFixed(2);
+        
+        // Автовывод
+        if (gameState.currentBet && currentMultiplier >= gameState.currentBet.cashoutAt) {
+            cashOut();
+        }
+        
+        // Проверка на краш
+        if (currentMultiplier >= gameState.crashPoint) {
+            crashGame();
+        }
+        
+        // Эффект дрожания при приближении к крашу
+        if (gameState.crashPoint - currentMultiplier < 0.5) {
+            const shake = (Math.random() - 0.5) * 4;
+            rocket.style.transform = `translateY(${shake}px) rotate(${shake * 2}deg)`;
+        }
+    }, 100);
+}
+
+function crashGame() {
+    if (!gameState.isRunning) return;
+    
+    clearInterval(rocketAnimationInterval);
+    
+    const rocket = document.getElementById('rocket');
+    const fire = document.getElementById('rocketFire');
+    
+    // Анимация взрыва
+    rocket.classList.remove('rocket-flying');
+    rocket.classList.add('rocket-exploding');
+    fire.style.display = 'none';
+    
+    // Добавление в историю
+    const now = new Date();
+    const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    
+    gameState.history.unshift({
+        multiplier: parseFloat(gameState.crashPoint.toFixed(2)),
+        win: false,
+        time: time
+    });
+    
+    userData.totalGames++;
+    userData.winRate = Math.round((userData.totalGames > 0 ? 
+        (userData.totalGames - (userData.totalGames * 0.4)) / userData.totalGames * 100 : 0));
+    
+    // Обновление отображения
+    updateHistoryDisplay();
+    updateUserStats();
+    
+    // Сброс состояния игры
+    setTimeout(() => {
+        endGame(`Краш на ${gameState.crashPoint.toFixed(2)}x!`);
+        rocket.classList.remove('rocket-exploding');
+        rocket.style.transform = 'translateY(0) rotate(0deg)';
+    }, 500);
+    
+    showNotification(`Краш на ${gameState.crashPoint.toFixed(2)}x`, 'error');
+}
+
+function cashOut() {
+    if (!gameState.isRunning || !gameState.currentBet) return;
+    
+    clearInterval(rocketAnimationInterval);
+    
+    const winAmount = gameState.currentBet.amount * gameState.currentMultiplier;
+    
+    // Начисление выигрыша
+    userData.balance += winAmount;
+    userData.totalWon += winAmount - gameState.currentBet.amount;
+    userData.totalGames++;
+    
+    // Обновление рекорда
+    if (gameState.currentMultiplier > userData.recordMultiplier) {
+        userData.recordMultiplier = gameState.currentMultiplier;
+    }
+    
+    // Обновление win rate
+    userData.winRate = Math.round((userData.totalGames > 0 ? 
+        (userData.totalGames - (userData.totalGames * 0.4)) / userData.totalGames * 100 : 0));
+    
+    // Добавление в историю
+    const now = new Date();
+    const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    
+    gameState.history.unshift({
+        multiplier: parseFloat(gameState.currentMultiplier.toFixed(2)),
+        win: true,
+        time: time
+    });
+    
+    // Обновление отображения
+    updateHistoryDisplay();
+    updateUserStats();
+    
+    // Анимация успешного вывода
+    const rocket = document.getElementById('rocket');
+    rocket.classList.remove('rocket-flying');
+    
+    // Сброс состояния игры
+    setTimeout(() => {
+        endGame(`Успешно! Выигрыш: ${winAmount.toFixed(2)} ★`);
+        rocket.style.transform = 'translateY(0) rotate(0deg)';
+    }, 300);
+    
+    showNotification(`Выигрыш: ${winAmount.toFixed(2)} ★!`, 'success');
+}
+
+// ===== ИСПРАВЛЕННЫЕ ФУНКЦИИ =====
+
+// Обновление статистики пользователя
+function updateUserStats() {
     document.getElementById('totalGames').textContent = userData.totalGames;
     document.getElementById('totalWon').textContent = userData.totalWon.toFixed(2);
     document.getElementById('winRate').textContent = userData.winRate + '%';
     document.getElementById('recordMultiplier').textContent = userData.recordMultiplier.toFixed(2) + 'x';
-    document.getElementById('regDate').textContent = userData.registrationDate;
+    document.getElementById('profileBalance').textContent = userData.balance.toFixed(2);
     document.getElementById('balance').textContent = userData.balance.toFixed(2);
+    document.getElementById('miniBalance').textContent = userData.balance.toFixed(2);
 }
+
+// Генерация точки краша с правильными вероятностями
+function generateCrashPoint() {
+    const random = Math.random();
+    
+    if (random < 0.4) {
+        // 40% - падает на 1.1-1.5x (часто)
+        gameState.crashPoint = 1.1 + Math.random() * 0.4;
+    } else if (random < 0.8) {
+        // 40% - падает на 1.5-2.0x
+        gameState.crashPoint = 1.5 + Math.random() * 0.5;
+    } else if (random < 0.95) {
+        // 15% - взлетает до 3.0x
+        gameState.crashPoint = 2.0 + Math.random() * 1.0;
+    } else {
+        // 5% - большой выигрыш 3.0-5.0x
+        gameState.crashPoint = 3.0 + Math.random() * 2.0;
+    }
+    
+    // Ограничение максимального множителя
+    if (gameState.crashPoint > 5.0) {
+        gameState.crashPoint = 5.0;
+    }
+}
+
+// Размещение ставки
+function placeBet() {
+    if (gameState.isRunning) {
+        showNotification('Игра уже запущена!', 'error');
+        return;
+    }
+    
+    if (gameState.betAmount > userData.balance) {
+        showNotification('Недостаточно звёзд!', 'error');
+        return;
+    }
+    
+    // Списываем ставку
+    userData.balance -= gameState.betAmount;
+    updateUserStats();
+    
+    // Начинаем игру
+    gameState.isRunning = true;
+    gameState.currentBet = {
+        amount: gameState.betAmount,
+        cashoutAt: gameState.autoCashout
+    };
+    
+    // Скрываем кнопку ставки, показываем кнопку вывода
+    document.getElementById('placeBetBtn').style.display = 'none';
+    document.getElementById('cashoutBtn').style.display = 'flex';
+    
+    // Генерация точки краша
+    generateCrashPoint();
+    
+    // Запуск анимации
+    startGameAnimation();
+    
+    showNotification('Ставка принята! Удачи!', 'success');
+}
+
+// Завершение игры
+function endGame(message) {
+    gameState.isRunning = false;
+    gameState.currentBet = null;
+    gameState.currentMultiplier = 1.00;
+    
+    document.getElementById('placeBetBtn').style.display = 'flex';
+    document.getElementById('cashoutBtn').style.display = 'none';
+    document.getElementById('currentMultiplier').textContent = '1.00x';
+    document.getElementById('crashPoint').style.display = 'none';
+    
+    // Останавливаем огонь
+    document.getElementById('rocketFire').style.display = 'none';
+    
+    // Сохранение данных
+    saveGameData();
+}
+
+// ===== ОСТАЛЬНЫЕ ФУНКЦИИ (без изменений, но с исправлениями) =====
 
 // Загрузка игровых данных
 function loadGameData() {
-    // Загрузка истории из localStorage
     const savedHistory = localStorage.getItem('crashHistory');
     if (savedHistory) {
         gameState.history = JSON.parse(savedHistory);
     } else {
-        // Начальная история
         gameState.history = [
             { multiplier: 1.25, win: true, time: '12:30' },
             { multiplier: 2.10, win: true, time: '12:28' },
@@ -114,14 +455,12 @@ function loadGameData() {
         ];
     }
     
-    // Загрузка статистики пользователя
     const savedStats = localStorage.getItem('userStats');
     if (savedStats) {
         const stats = JSON.parse(savedStats);
         Object.assign(userData, stats);
     }
     
-    // Обновление отображения
     updateHistoryDisplay();
     updateUserStats();
 }
@@ -137,7 +476,7 @@ function updateHistoryDisplay() {
     const historyList = document.getElementById('historyList');
     historyList.innerHTML = '';
     
-    gameState.history.slice(0, 10).forEach(game => {
+    gameState.history.slice(0, 8).forEach(game => {
         const historyItem = document.createElement('div');
         historyItem.className = 'history-item';
         historyItem.innerHTML = `
@@ -148,26 +487,14 @@ function updateHistoryDisplay() {
     });
 }
 
-// Обновление статистики пользователя
-function updateUserStats() {
-    document.getElementById('totalGames').textContent = userData.totalGames;
-    document.getElementById('totalWon').textContent = userData.totalWon.toFixed(2);
-    document.getElementById('winRate').textContent = userData.winRate + '%';
-    document.getElementById('recordMultiplier').textContent = userData.recordMultiplier.toFixed(2) + 'x';
-    document.getElementById('profileBalance').textContent = userData.balance.toFixed(2);
-    document.getElementById('balance').textContent = userData.balance.toFixed(2);
-}
-
 // Обновление онлайн игроков
 function updateOnlinePlayers() {
-    // Генерация случайного числа онлайн игроков (в реальном приложении получать с сервера)
     gameState.onlinePlayers = Math.floor(Math.random() * 100) + 50;
     document.getElementById('onlinePlayers').textContent = gameState.onlinePlayers;
 }
 
 // Загрузка топа игроков
 function loadTopPlayers(period = 'day') {
-    // Генерация тестовых данных (в реальном приложении получать с сервера)
     gameState.topPlayers = [
         { id: 1, name: 'Алексей 🏆', profit: 150.50, avatar: '👑', games: 42 },
         { id: 2, name: 'Мария ⭐', profit: 120.75, avatar: '⭐', games: 38 },
@@ -181,7 +508,6 @@ function loadTopPlayers(period = 'day') {
         { id: 10, name: 'Наталья 🌟', profit: 21.50, avatar: '🌟', games: 25 }
     ];
     
-    // Обновление отображения
     const topList = document.getElementById('topList');
     topList.innerHTML = '';
     
@@ -202,7 +528,6 @@ function loadTopPlayers(period = 'day') {
         topList.appendChild(topPlayer);
     });
     
-    // Обновление позиции пользователя
     document.getElementById('userRank').textContent = Math.floor(Math.random() * 100) + 11;
     document.getElementById('userProfit').textContent = userData.totalWon.toFixed(2);
 }
@@ -264,284 +589,11 @@ function updatePotentialWin() {
     document.getElementById('potentialWin').textContent = potentialWin.toFixed(2);
 }
 
-// Размещение ставки
-function placeBet() {
-    if (gameState.isRunning) {
-        showNotification('Игра уже запущена!', 'error');
-        return;
-    }
-    
-    if (gameState.betAmount > userData.balance) {
-        showNotification('Недостаточно звёзд! Пополните баланс.', 'error');
-        return;
-    }
-    
-    // Списываем ставку
-    userData.balance -= gameState.betAmount;
-    updateUserStats();
-    
-    // Начинаем игру
-    gameState.isRunning = true;
-    gameState.currentBet = {
-        amount: gameState.betAmount,
-        cashoutAt: gameState.autoCashout
-    };
-    
-    // Скрываем кнопку ставки, показываем кнопку вывода
-    document.getElementById('placeBetBtn').style.display = 'none';
-    document.getElementById('cashoutBtn').style.display = 'flex';
-    
-    // Генерация точки краша
-    generateCrashPoint();
-    
-    // Запуск анимации
-    startGameAnimation();
-    
-    showNotification('Ставка принята! Удачи!', 'success');
-}
-
-// Генерация точки краша
-function generateCrashPoint() {
-    const random = Math.random();
-    
-    // Вероятности согласно требованиям:
-    // Часто падает на 1.1-1.5x
-    // Иногда взлетает до 5x
-    // Редко выше 5x
-    
-    if (random < 0.6) {
-        // 60% - падает на 1.1-1.5x
-        gameState.crashPoint = 1.1 + Math.random() * 0.4;
-    } else if (random < 0.9) {
-        // 30% - падает на 1.5-2.5x
-        gameState.crashPoint = 1.5 + Math.random() * 1.0;
-    } else if (random < 0.98) {
-        // 8% - взлетает до 5x
-        gameState.crashPoint = 2.5 + Math.random() * 2.5;
-    } else {
-        // 2% - большой выигрыш
-        gameState.crashPoint = 5 + Math.random() * 10;
-    }
-    
-    // Обновление отображения
-    document.getElementById('crashPoint').querySelector('span').textContent = gameState.crashPoint.toFixed(2);
-}
-
-// Запуск анимации игры
-function startGameAnimation() {
-    const rocket = document.getElementById('rocket');
-    const multiplierDisplay = document.getElementById('currentMultiplier');
-    const cashoutMultiplier = document.getElementById('cashoutMultiplier');
-    
-    let currentMultiplier = 1.00;
-    let height = 0;
-    let rotation = 0;
-    let speed = 0.01;
-    
-    // Сброс позиции
-    rocket.style.bottom = '30px';
-    rocket.style.transform = 'translateX(-50%) rotate(0deg)';
-    rocket.classList.remove('exploding');
-    
-    // Запуск игрового цикла
-    gameState.gameInterval = setInterval(() => {
-        if (!gameState.isRunning) {
-            clearInterval(gameState.gameInterval);
-            return;
-        }
-        
-        // Увеличение множителя
-        currentMultiplier += speed;
-        gameState.currentMultiplier = currentMultiplier;
-        
-        // Увеличение скорости со временем
-        speed *= 1.005;
-        
-        // Анимация ракеты
-        height += 0.5;
-        rotation = Math.sin(Date.now() / 100) * 15;
-        
-        rocket.style.bottom = `${30 + height}px`;
-        rocket.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
-        
-        // Обновление отображения множителя
-        multiplierDisplay.textContent = currentMultiplier.toFixed(2) + 'x';
-        cashoutMultiplier.textContent = currentMultiplier.toFixed(2);
-        
-        // Автоматический вывод
-        if (gameState.currentBet && currentMultiplier >= gameState.currentBet.cashoutAt) {
-            cashOut();
-        }
-        
-        // Проверка на краш
-        if (currentMultiplier >= gameState.crashPoint) {
-            crashGame();
-        }
-        
-        // Ограничение высоты
-        if (height > 150) {
-            rocket.style.bottom = '30px';
-            height = 0;
-        }
-    }, 50);
-}
-
-// Вывод средств
-function cashOut() {
-    if (!gameState.isRunning || !gameState.currentBet) return;
-    
-    clearInterval(gameState.gameInterval);
-    
-    const winAmount = gameState.currentBet.amount * gameState.currentMultiplier;
-    
-    // Начисление выигрыша
-    userData.balance += winAmount;
-    userData.totalWon += winAmount - gameState.currentBet.amount;
-    userData.totalGames++;
-    
-    // Обновление рекорда
-    if (gameState.currentMultiplier > userData.recordMultiplier) {
-        userData.recordMultiplier = gameState.currentMultiplier;
-    }
-    
-    // Обновление win rate
-    userData.winRate = Math.round((userData.totalGames > 0 ? 
-        (userData.totalGames - (userData.totalGames * 0.4)) / userData.totalGames * 100 : 0));
-    
-    // Добавление в историю
-    const now = new Date();
-    const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    
-    gameState.history.unshift({
-        multiplier: parseFloat(gameState.currentMultiplier.toFixed(2)),
-        win: true,
-        time: time
-    });
-    
-    // Обновление отображения
-    updateHistoryDisplay();
-    updateUserStats();
-    
-    // Анимация успешного вывода
-    const rocket = document.getElementById('rocket');
-    rocket.classList.add('launching');
-    
-    // Сброс состояния игры
-    setTimeout(() => {
-        endGame(`Успешно! Вы выиграли ${winAmount.toFixed(2)} ★`);
-        rocket.classList.remove('launching');
-    }, 1000);
-    
-    showNotification(`Выигрыш: ${winAmount.toFixed(2)} ★!`, 'success');
-}
-
-// Краш игры
-function crashGame() {
-    if (!gameState.isRunning) return;
-    
-    clearInterval(gameState.gameInterval);
-    
-    // Добавление в историю
-    const now = new Date();
-    const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    
-    gameState.history.unshift({
-        multiplier: parseFloat(gameState.crashPoint.toFixed(2)),
-        win: false,
-        time: time
-    });
-    
-    userData.totalGames++;
-    userData.winRate = Math.round((userData.totalGames > 0 ? 
-        (userData.totalGames - (userData.totalGames * 0.4)) / userData.totalGames * 100 : 0));
-    
-    // Анимация взрыва
-    const rocket = document.getElementById('rocket');
-    rocket.classList.add('exploding');
-    
-    // Обновление отображения
-    updateHistoryDisplay();
-    updateUserStats();
-    
-    // Сброс состояния игры
-    setTimeout(() => {
-        endGame(`Краш на ${gameState.crashPoint.toFixed(2)}x! Вы проиграли ${gameState.currentBet.amount.toFixed(2)} ★`);
-        rocket.classList.remove('exploding');
-        rocket.style.bottom = '30px';
-        rocket.style.transform = 'translateX(-50%) rotate(0deg)';
-    }, 500);
-    
-    showNotification(`Краш на ${gameState.crashPoint.toFixed(2)}x`, 'error');
-}
-
-// Завершение игры
-function endGame(message) {
-    gameState.isRunning = false;
-    gameState.currentBet = null;
-    gameState.currentMultiplier = 1.00;
-    
-    document.getElementById('placeBetBtn').style.display = 'flex';
-    document.getElementById('cashoutBtn').style.display = 'none';
-    document.getElementById('currentMultiplier').textContent = '1.00x';
-    
-    // Сохранение данных
-    saveGameData();
-    
-    // Можно показать сообщение
-    if (message) {
-        console.log(message);
-    }
-}
-
-// Управление экранами
-function showScreen(screenId) {
-    // Скрываем все экраны
-    document.querySelectorAll('.screen').forEach(screen => {
-        screen.classList.remove('active');
-    });
-    
-    // Скрываем все активные кнопки навигации
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.remove('active');
-    });
-    
-    // Показываем выбранный экран
-    let screenElement;
-    switch (screenId) {
-        case 'main':
-            screenElement = document.getElementById('mainScreen');
-            document.querySelectorAll('.nav-item')[1].classList.add('active');
-            tg.BackButton.hide();
-            break;
-        case 'top':
-            screenElement = document.getElementById('topScreen');
-            document.querySelectorAll('.nav-item')[0].classList.add('active');
-            tg.BackButton.show();
-            break;
-        case 'profile':
-            screenElement = document.getElementById('profileScreen');
-            document.querySelectorAll('.nav-item')[2].classList.add('active');
-            tg.BackButton.show();
-            break;
-        case 'deposit':
-            screenElement = document.getElementById('depositScreen');
-            tg.BackButton.show();
-            break;
-        default:
-            screenElement = document.getElementById('mainScreen');
-    }
-    
-    if (screenElement) {
-        screenElement.classList.add('active');
-    }
-}
-
 // Пополнение баланса
 function setDepositAmount(amount) {
     document.getElementById('depositStars').value = amount;
     updateDepositAmount();
     
-    // Активируем пресет
     document.querySelectorAll('.amount-preset').forEach(preset => {
         preset.classList.remove('active');
         if (parseInt(preset.dataset.amount) === amount) {
@@ -563,36 +615,16 @@ function updateDepositAmount() {
 function processPayment() {
     const stars = parseInt(document.getElementById('depositStars').value) || 10;
     
-    // Показываем модальное окно оплаты
     document.getElementById('paymentModal').classList.add('show');
     
-    // Имитация процесса оплаты
     setTimeout(() => {
-        // Успешная оплата
         userData.balance += stars;
         userData.totalDeposited += stars;
         
-        // Обновление отображения
         updateUserStats();
-        
-        // Закрытие модального окна
         closePaymentModal();
-        
-        // Показ уведомления
         showNotification(`Баланс пополнен на ${stars} ★!`, 'success');
-        
-        // Добавление в историю пополнений
         addDepositToHistory(stars);
-        
-        // В реальном приложении здесь будет вызов Telegram Payments API:
-        // tg.sendInvoice({
-        //     title: 'Пополнение баланса',
-        //     description: `${stars} Telegram Stars`,
-        //     payload: 'deposit_' + stars,
-        //     currency: 'XTR',
-        //     prices: [{ label: 'Stars', amount: stars * 100 }]
-        // });
-        
     }, 2000);
 }
 
@@ -615,8 +647,7 @@ function addDepositToHistory(amount) {
     
     historyContainer.insertBefore(historyItem, historyContainer.firstChild);
     
-    // Ограничиваем историю 10 записями
-    if (historyContainer.children.length > 10) {
+    if (historyContainer.children.length > 5) {
         historyContainer.removeChild(historyContainer.lastChild);
     }
 }
@@ -627,21 +658,21 @@ function showNotification(message, type = 'success') {
     const notificationText = notification.querySelector('.notification-text');
     const notificationIcon = notification.querySelector('.notification-icon i');
     
-    // Устанавливаем сообщение и иконку
     notificationText.textContent = message;
     
     if (type === 'success') {
         notificationIcon.className = 'fas fa-check-circle';
         notification.style.borderLeftColor = '#00ff00';
-    } else {
+    } else if (type === 'error') {
         notificationIcon.className = 'fas fa-exclamation-circle';
         notification.style.borderLeftColor = '#ff6b6b';
+    } else {
+        notificationIcon.className = 'fas fa-info-circle';
+        notification.style.borderLeftColor = '#00c6ff';
     }
     
-    // Показываем уведомление
     notification.classList.add('show');
     
-    // Скрываем через 3 секунды
     setTimeout(() => {
         notification.classList.remove('show');
     }, 3000);
@@ -654,14 +685,6 @@ function showInventory() {
 
 function showRewards() {
     showNotification('Награды в разработке', 'info');
-}
-
-function showWithdraw() {
-    showNotification('Вывод средств в разработке', 'info');
-}
-
-function showReferrals() {
-    showNotification('Реферальная система в разработке', 'info');
 }
 
 function showTransactions() {
@@ -681,7 +704,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('cashoutSlider').addEventListener('input', updateAutoCashout);
     document.getElementById('depositStars').addEventListener('input', updateDepositAmount);
     
-    // Инициализация пресетов пополнения
+    // Инициализация пресетов
     document.querySelectorAll('.top-tab').forEach(tab => {
         tab.addEventListener('click', function() {
             document.querySelectorAll('.top-tab').forEach(t => t.classList.remove('active'));

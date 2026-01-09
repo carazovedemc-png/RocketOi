@@ -1,195 +1,123 @@
-/* Базовые стили */
+/* ===== БАЗОВЫЕ ИСПРАВЛЕНИЯ ===== */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
     user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+
+html, body {
+    overflow: hidden !important;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    touch-action: none;
 }
 
 body {
     background: #0a0a0f;
     color: #ffffff;
-    min-height: 100vh;
-    overflow-x: hidden;
-    position: relative;
+    overflow: hidden;
+    overscroll-behavior: none;
 }
 
+/* ===== ЗАПРЕТ СКРОЛЛИНГА ===== */
 .screen {
     display: none;
-    min-height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
     padding-bottom: 80px;
+    padding-top: 20px; /* Отступ для кнопок Telegram */
 }
 
 .screen.active {
     display: block;
 }
 
-/* Полноэкранный режим */
-.fullscreen-header {
+/* ===== СИСТЕМНЫЕ КНОПКИ TELEGRAM ===== */
+.telegram-buttons-space {
     height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 15px;
-    background: rgba(10, 10, 15, 0.95);
-    backdrop-filter: blur(10px);
+    width: 100%;
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 10000;
+    pointer-events: none;
 }
 
-.btn-close {
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 20px;
-    cursor: pointer;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+/* ===== ВЕРХНИЙ ХЕДЕР ДЛЯ КНОПОК ПРИЛОЖЕНИЯ ===== */
+.app-header {
     display: flex;
     align-items: center;
-    justify-content: center;
-    transition: background 0.3s;
-}
-
-.btn-close:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-/* Верхняя панель */
-.header {
-    padding: 15px;
-    display: flex;
     justify-content: space-between;
-    align-items: center;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    border-radius: 0 0 20px 20px;
-    margin-bottom: 15px;
+    padding: 15px;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1000;
 }
 
-.user-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
+/* ===== ИСПРАВЛЕНИЕ АВАТАРА ===== */
 .user-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    border: 3px solid #00c6ff;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
-    border: 3px solid #00c6ff;
+    flex-shrink: 0;
 }
 
-.user-info {
-    display: flex;
-    flex-direction: column;
+.user-avatar img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
 }
 
-.user-name {
-    font-weight: 600;
-    font-size: 16px;
-}
-
-.user-id {
-    font-size: 12px;
-    color: #8a8a9e;
-}
-
-.balance-card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 15px;
-    padding: 12px 15px;
-    min-width: 150px;
-    text-align: center;
-}
-
-.balance-label {
-    font-size: 12px;
-    color: #8a8a9e;
-    margin-bottom: 5px;
-}
-
-.balance-amount {
-    font-size: 24px;
-    font-weight: 700;
-    color: #FFD700;
+.profile-avatar-large {
+    width: 80px !important;
+    height: 80px !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    border: 4px solid #00c6ff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    flex-shrink: 0;
 }
 
-.btn-deposit {
-    background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
-    border: none;
-    color: white;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    font-size: 14px;
-    cursor: pointer;
-    margin-top: 8px;
-    transition: transform 0.2s;
+.profile-avatar-large img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
 }
 
-.btn-deposit:hover {
-    transform: scale(1.1);
-}
-
-/* Игровое поле */
-.game-container {
-    padding: 0 15px;
-}
-
+/* ===== ИГРОВОЕ ПОЛЕ С РАКЕТКОЙ ===== */
 .game-area {
     background: #000000;
     border-radius: 20px;
     overflow: hidden;
     position: relative;
-    margin-bottom: 15px;
+    margin: 0 15px 15px;
     height: 320px;
-}
-
-.space-background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(circle at center, #0f0c29 0%, #000000 70%);
-    overflow: hidden;
-}
-
-.stars {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-image: 
-        radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.8) 1px, transparent 1px),
-        radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.6) 1px, transparent 1px),
-        radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.4) 1px, transparent 1px);
-    background-size: 200px 200px, 300px 300px, 400px 400px;
-}
-
-.stars.small {
-    background-size: 100px 100px, 150px 150px, 200px 200px;
-    animation: twinkle 4s infinite alternate;
-}
-
-@keyframes twinkle {
-    0% { opacity: 0.3; }
-    100% { opacity: 1; }
+    touch-action: none;
 }
 
 .rocket-display {
@@ -202,415 +130,165 @@ body {
     z-index: 2;
 }
 
-.multiplier-display {
-    position: absolute;
-    top: 20px;
-    text-align: center;
-    z-index: 10;
-}
-
-.multiplier-label {
-    font-size: 14px;
-    color: #8a8a9e;
-    margin-bottom: 5px;
-}
-
-.multiplier-value {
-    font-size: 36px;
-    font-weight: 800;
-    color: #00ff00;
-    text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
-}
-
 .rocket-wrapper {
     position: relative;
     margin-top: 40px;
 }
 
-.rocket {
+/* ===== НОВАЯ АНИМАЦИЯ РАКЕТКИ ===== */
+.rocket-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.telegram-rocket {
     font-size: 80px;
     position: relative;
     z-index: 5;
-    transform-origin: center bottom;
-    transition: transform 0.1s linear;
+    transition: all 0.1s linear;
+    display: inline-block;
 }
 
-.flame {
+/* Анимация взлета и вращения */
+@keyframes rocketFly {
+    0% {
+        transform: translateY(0) rotate(0deg) scale(1);
+    }
+    25% {
+        transform: translateY(-10px) rotate(90deg) scale(1.1);
+    }
+    50% {
+        transform: translateY(-20px) rotate(180deg) scale(1.2);
+    }
+    75% {
+        transform: translateY(-30px) rotate(270deg) scale(1.1);
+    }
+    100% {
+        transform: translateY(-40px) rotate(360deg) scale(1);
+    }
+}
+
+@keyframes rocketFloat {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes explosion {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+        filter: brightness(1);
+    }
+    50% {
+        transform: scale(1.5);
+        opacity: 0.8;
+        filter: brightness(2);
+    }
+    100% {
+        transform: scale(2);
+        opacity: 0;
+        filter: brightness(3);
+    }
+}
+
+/* Анимация огня */
+@keyframes fireFlicker {
+    0%, 100% {
+        opacity: 0.8;
+        transform: scaleY(1);
+    }
+    50% {
+        opacity: 1;
+        transform: scaleY(1.2);
+    }
+}
+
+.fire {
     position: absolute;
-    bottom: -20px;
+    bottom: -30px;
     left: 50%;
     transform: translateX(-50%);
-    width: 40px;
-    height: 40px;
-    background: radial-gradient(circle, #ff6b6b 0%, #ff0000 50%, transparent 70%);
-    border-radius: 50%;
-    animation: flame 0.3s infinite alternate;
+    font-size: 40px;
+    color: #FF6B00;
+    z-index: 4;
+    animation: fireFlicker 0.2s infinite;
 }
 
-@keyframes flame {
-    0% { transform: translateX(-50%) scale(1); }
-    100% { transform: translateX(-50%) scale(1.2); }
+.rocket-flying {
+    animation: rocketFly 0.5s linear infinite;
 }
 
-@keyframes rocketLaunch {
-    0% { transform: translateY(0) rotate(0deg); }
-    25% { transform: translateY(-20px) rotate(5deg); }
-    50% { transform: translateY(-40px) rotate(-5deg); }
-    75% { transform: translateY(-60px) rotate(3deg); }
-    100% { transform: translateY(-80px) rotate(0deg); }
+.rocket-exploding {
+    animation: explosion 0.5s forwards;
 }
 
-@keyframes rocketExplode {
-    0% { transform: scale(1); opacity: 1; }
-    100% { transform: scale(3); opacity: 0; }
-}
-
-.rocket.launching {
-    animation: rocketLaunch 0.5s ease-out forwards;
-}
-
-.rocket.exploding {
-    animation: rocketExplode 0.5s ease-out forwards;
-}
-
-.crash-point {
+/* Космический фон */
+.space-background {
     position: absolute;
-    bottom: 20px;
-    background: rgba(255, 0, 0, 0.2);
-    border: 1px solid rgba(255, 0, 0, 0.5);
-    padding: 8px 15px;
-    border-radius: 10px;
-    font-size: 14px;
-}
-
-.crash-point span {
-    color: #ff6b6b;
-    font-weight: 600;
-}
-
-.game-stats {
-    display: flex;
-    justify-content: space-around;
-    padding: 15px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 0 0 20px 20px;
-}
-
-.stat {
-    text-align: center;
-}
-
-.stat-label {
-    font-size: 12px;
-    color: #8a8a9e;
-    margin-bottom: 5px;
-}
-
-.stat-value {
-    font-size: 16px;
-    font-weight: 600;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-}
-
-/* Управление ставками */
-.bet-controls {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
-    padding: 20px;
-    margin-bottom: 15px;
-}
-
-.bet-amount {
-    margin-bottom: 20px;
-}
-
-.input-group {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 15px;
-}
-
-.btn-minus, .btn-plus {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-minus:hover, .btn-plus:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-.bet-input {
-    flex: 1;
-    margin: 0 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    padding: 10px;
-}
-
-.bet-input i {
-    color: #FFD700;
-    font-size: 20px;
-    margin-right: 10px;
-}
-
-.bet-input input {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 24px;
-    font-weight: 600;
-    width: 100px;
-    text-align: center;
-    outline: none;
-}
-
-.quick-bets {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    padding-bottom: 5px;
-}
-
-.chip {
-    background: rgba(0, 198, 255, 0.1);
-    border: 1px solid #00c6ff;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 25px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.2s;
-}
-
-.chip:hover {
-    background: rgba(0, 198, 255, 0.2);
-}
-
-.auto-cashout {
-    margin-bottom: 20px;
-}
-
-.auto-cashout-label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 14px;
-    color: #8a8a9e;
-    margin-bottom: 10px;
-}
-
-.auto-cashout-label i {
-    color: #00c6ff;
-}
-
-.auto-cashout-input {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
-#cashoutSlider {
-    flex: 1;
-    height: 6px;
-    -webkit-appearance: none;
-    background: linear-gradient(to right, #00c6ff, #0072ff);
-    border-radius: 3px;
-    outline: none;
-}
-
-#cashoutSlider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: white;
-    cursor: pointer;
-    border: 3px solid #00c6ff;
-}
-
-.slider-value {
-    background: rgba(0, 198, 255, 0.2);
-    border: 1px solid #00c6ff;
-    padding: 8px 15px;
-    border-radius: 10px;
-    font-weight: 600;
-    min-width: 70px;
-    text-align: center;
-}
-
-.cashout-presets {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-}
-
-.preset {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;
-    padding: 8px 15px;
-    border-radius: 10px;
-    font-size: 13px;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.2s;
-}
-
-.preset:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.action-buttons {
-    display: flex;
-    gap: 15px;
-}
-
-.btn-bet, .btn-cashout {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    border: none;
-    border-radius: 15px;
-    font-weight: 700;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.btn-bet {
-    background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
-    color: white;
-}
-
-.btn-cashout {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
-    color: white;
-}
-
-.btn-bet:hover, .btn-cashout:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.btn-bet i, .btn-cashout i {
-    font-size: 24px;
-    margin-bottom: 10px;
-}
-
-.bet-summary, .cashout-summary {
-    margin-top: 10px;
-    font-size: 14px;
-    opacity: 0.9;
-}
-
-/* История игр */
-.game-history {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
-    padding: 20px;
-}
-
-.history-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.history-header h3 {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 18px;
-}
-
-.online-count {
-    background: rgba(0, 198, 255, 0.1);
-    border: 1px solid rgba(0, 198, 255, 0.3);
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.history-list {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    padding-bottom: 10px;
-}
-
-.history-item {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-    padding: 15px;
-    min-width: 80px;
-    text-align: center;
-    flex-shrink: 0;
-}
-
-.history-multiplier {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 5px;
-}
-
-.history-multiplier.win {
-    color: #00ff00;
-}
-
-.history-multiplier.loss {
-    color: #ff6b6b;
-}
-
-.history-time {
-    font-size: 12px;
-    color: #8a8a9e;
-}
-
-/* Нижняя навигация */
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
+    top: 0;
     left: 0;
     right: 0;
-    background: #000000;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 30%, #0f0c29 0%, transparent 40%),
+        radial-gradient(circle at 70% 60%, #24243e 0%, transparent 40%),
+        radial-gradient(circle at 40% 80%, #302b63 0%, transparent 40%),
+        #000000;
+}
+
+.stars {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(1px 1px at 20px 30px, #ffffff 50%, transparent 100%),
+        radial-gradient(1px 1px at 40px 70px, #ffffff 50%, transparent 100%),
+        radial-gradient(1px 1px at 60px 20px, #ffffff 50%, transparent 100%),
+        radial-gradient(1px 1px at 80px 50px, #ffffff 50%, transparent 100%),
+        radial-gradient(1px 1px at 100px 80px, #ffffff 50%, transparent 100%),
+        radial-gradient(1px 1px at 120px 40px, #ffffff 50%, transparent 100%),
+        radial-gradient(1px 1px at 140px 60px, #ffffff 50%, transparent 100%),
+        radial-gradient(1px 1px at 160px 90px, #ffffff 50%, transparent 100%),
+        radial-gradient(1px 1px at 180px 30px, #ffffff 50%, transparent 100%),
+        radial-gradient(1px 1px at 200px 70px, #ffffff 50%, transparent 100%);
+    background-size: 220px 100px;
+    animation: starsTwinkle 4s infinite alternate;
+}
+
+@keyframes starsTwinkle {
+    0% { opacity: 0.3; }
+    100% { opacity: 0.8; }
+}
+
+/* ===== ИСПРАВЛЕННАЯ НИЖНЯЯ НАВИГАЦИЯ ===== */
+.bottom-nav {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    border-radius: 25px;
+    padding: 8px;
+    display: flex;
+    gap: 0;
     z-index: 1000;
-    padding: 10px 20px;
+    width: auto;
+    min-width: 280px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .nav-container {
     display: flex;
-    justify-content: space-around;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 50px;
-    padding: 10px;
+    gap: 0;
 }
 
 .nav-item {
@@ -620,876 +298,197 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
     padding: 10px 20px;
     cursor: pointer;
     transition: all 0.3s;
-    border-radius: 20px;
-    flex: 1;
-    max-width: 120px;
+    border-radius: 15px;
+    min-width: 80px;
+    position: relative;
+}
+
+/* Перегородки между кнопками */
+.nav-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 20px;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.15);
 }
 
 .nav-item.active {
-    background: rgba(0, 198, 255, 0.2);
+    background: rgba(0, 198, 255, 0.15);
     color: #00c6ff;
 }
 
 .nav-icon {
-    font-size: 22px;
+    font-size: 20px;
+    margin-bottom: 4px;
 }
 
 .nav-label {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
 }
 
-.nav-divider {
-    width: 1px;
-    height: 30px;
-    background: rgba(255, 255, 255, 0.1);
-}
-
-/* Заголовки экранов */
-.screen-header {
+/* ===== ИСПРАВЛЕНИЕ ОТОБРАЖЕНИЯ КНОПОК В РАЗНЫХ ЭКРАНАХ ===== */
+/* Главный экран (Краш) */
+.crash-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 15px;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    border-radius: 0 0 20px 20px;
-    margin-bottom: 20px;
-}
-
-.btn-back {
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    color: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-.btn-back:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-.screen-header h2 {
-    font-size: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.header-actions {
-    display: flex;
-    gap: 10px;
-}
-
-.btn-refresh, .btn-settings {
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    color: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-.btn-refresh:hover, .btn-settings:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-/* Экран топа */
-.top-tabs {
-    display: flex;
-    gap: 10px;
-    padding: 0 15px 15px;
-    overflow-x: auto;
-}
-
-.top-tab {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #8a8a9e;
-    padding: 10px 20px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.3s;
-}
-
-.top-tab.active {
-    background: rgba(0, 198, 255, 0.2);
-    border-color: #00c6ff;
-    color: #00c6ff;
-}
-
-.top-list {
-    padding: 0 15px;
-}
-
-.top-player {
-    display: flex;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 15px;
-    padding: 15px;
-    margin-bottom: 10px;
-    transition: transform 0.2s;
-}
-
-.top-player:hover {
-    transform: translateX(5px);
-}
-
-.top-rank {
-    font-size: 20px;
-    font-weight: 700;
-    width: 40px;
-    text-align: center;
-    color: #FFD700;
-}
-
-.top-player:nth-child(1) .top-rank {
-    color: #FFD700;
-}
-
-.top-player:nth-child(2) .top-rank {
-    color: #C0C0C0;
-}
-
-.top-player:nth-child(3) .top-rank {
-    color: #CD7F32;
-}
-
-.player-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    margin: 0 15px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-}
-
-.player-info {
-    flex: 1;
-}
-
-.player-name {
-    font-weight: 600;
-    margin-bottom: 5px;
-}
-
-.player-stats {
-    display: flex;
-    gap: 15px;
-    font-size: 14px;
-    color: #8a8a9e;
-}
-
-.player-profit {
-    font-weight: 700;
-    color: #00ff00;
-}
-
-.user-top-position {
-    background: rgba(0, 198, 255, 0.1);
-    border: 1px solid rgba(0, 198, 255, 0.3);
-    border-radius: 15px;
-    padding: 20px;
-    margin: 20px 15px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.user-rank, .user-profit {
-    text-align: center;
-}
-
-.rank-label, .profit-label {
-    font-size: 14px;
-    color: #8a8a9e;
-    margin-bottom: 5px;
-}
-
-.rank-value {
-    font-size: 28px;
-    font-weight: 800;
-    color: #00c6ff;
-}
-
-.profit-value {
-    font-size: 28px;
-    font-weight: 800;
-    color: #00ff00;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
+    padding: 10px 15px;
+    margin: 0 15px 15px;
 }
 
 /* Экран профиля */
-.profile-container {
-    padding: 0 15px;
-}
-
-.profile-header {
+.profile-header-container {
     display: flex;
     align-items: center;
-    gap: 20px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
-    padding: 20px;
-    margin-bottom: 20px;
-}
-
-.profile-avatar-large {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 36px;
-    border: 4px solid #00c6ff;
-}
-
-.profile-info h3 {
-    font-size: 24px;
-    margin-bottom: 5px;
-}
-
-.profile-id {
-    font-size: 14px;
-    color: #8a8a9e;
-    margin-bottom: 10px;
-}
-
-.profile-registration {
-    font-size: 14px;
-    color: #8a8a9e;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.profile-balance {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
-    padding: 20px;
-    margin-bottom: 20px;
-}
-
-.balance-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-}
-
-.balance-stat {
-    text-align: center;
-}
-
-.balance-stat .stat-label {
-    font-size: 12px;
-    color: #8a8a9e;
-    margin-bottom: 8px;
-}
-
-.balance-stat .stat-value {
-    font-size: 18px;
-    font-weight: 700;
-    color: #FFD700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-}
-
-.profile-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
-.stat-card {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 15px;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.stat-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
-    background: rgba(0, 198, 255, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    color: #00c6ff;
-}
-
-.stat-content {
-    flex: 1;
-}
-
-.stat-content .stat-label {
-    font-size: 14px;
-    color: #8a8a9e;
-    margin-bottom: 5px;
-}
-
-.stat-content .stat-value {
-    font-size: 20px;
-    font-weight: 700;
-    color: white;
-}
-
-.profile-actions {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
-    padding: 10px;
-    margin-bottom: 20px;
-}
-
-.profile-action-btn {
-    background: none;
-    border: none;
-    color: white;
-    display: flex;
-    align-items: center;
-    width: 100%;
+    justify-content: space-between;
     padding: 15px;
-    cursor: pointer;
-    border-radius: 15px;
-    transition: background 0.3s;
-    margin-bottom: 5px;
+    margin-bottom: 20px;
 }
 
-.profile-action-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.action-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
-    background: rgba(0, 198, 255, 0.2);
+/* Экран топа */
+.top-header-container {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    color: #00c6ff;
-    margin-right: 15px;
-}
-
-.action-text {
-    flex: 1;
-    text-align: left;
-}
-
-.action-title {
-    font-weight: 600;
-    margin-bottom: 3px;
-}
-
-.action-subtitle {
-    font-size: 14px;
-    color: #8a8a9e;
-}
-
-.inventory-count {
-    background: rgba(255, 0, 0, 0.2);
-    color: #ff6b6b;
-    padding: 5px 10px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    margin-right: 15px;
-}
-
-.action-arrow {
-    color: #8a8a9e;
+    justify-content: space-between;
+    padding: 15px;
+    margin-bottom: 20px;
 }
 
 /* Экран пополнения */
-.deposit-container {
-    padding: 0 15px;
-}
-
-.deposit-info {
-    margin-bottom: 20px;
-}
-
-.info-card {
-    background: rgba(0, 198, 255, 0.1);
-    border: 1px solid rgba(0, 198, 255, 0.3);
-    border-radius: 15px;
-    padding: 15px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.info-card i {
-    color: #00c6ff;
-    font-size: 24px;
-}
-
-.info-card p {
-    font-size: 14px;
-    line-height: 1.4;
-}
-
-.deposit-amount {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
-    padding: 20px;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.deposit-amount h3 {
-    margin-bottom: 20px;
-    font-size: 18px;
-}
-
-.amount-input {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
-.amount-input i {
-    color: #FFD700;
-    font-size: 36px;
-}
-
-.amount-input input {
-    background: none;
-    border: none;
-    color: #FFD700;
-    font-size: 48px;
-    font-weight: 700;
-    width: 150px;
-    text-align: center;
-    outline: none;
-}
-
-.amount-label {
-    font-size: 24px;
-    color: #FFD700;
-    font-weight: 600;
-}
-
-.amount-rub {
-    font-size: 18px;
-    color: #8a8a9e;
-    margin-bottom: 20px;
-}
-
-.amount-presets {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-}
-
-.amount-preset {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 15px;
-    padding: 15px;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.amount-preset:hover {
-    background: rgba(0, 198, 255, 0.1);
-    border-color: #00c6ff;
-}
-
-.amount-preset.active {
-    background: rgba(0, 198, 255, 0.2);
-    border-color: #00c6ff;
-}
-
-.preset-stars {
-    font-size: 20px;
-    font-weight: 700;
-    color: #FFD700;
-    margin-bottom: 5px;
-}
-
-.preset-rub {
-    font-size: 14px;
-    color: #8a8a9e;
-}
-
-.payment-methods {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
-    padding: 20px;
-    margin-bottom: 20px;
-}
-
-.payment-methods h3 {
-    margin-bottom: 15px;
-    font-size: 18px;
-}
-
-.method-selector {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 15px;
-    overflow: hidden;
-}
-
-.method {
-    display: flex;
-    align-items: center;
-    padding: 20px;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-.method:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.method.active {
-    background: rgba(0, 198, 255, 0.2);
-}
-
-.method-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
-    background: rgba(255, 215, 0, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    color: #FFD700;
-    margin-right: 15px;
-}
-
-.method-info {
-    flex: 1;
-}
-
-.method-name {
-    font-weight: 600;
-    margin-bottom: 5px;
-}
-
-.method-desc {
-    font-size: 14px;
-    color: #8a8a9e;
-}
-
-.method-check {
-    color: #00ff00;
-    font-size: 20px;
-}
-
-.btn-pay {
-    width: 100%;
-    background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
-    border: none;
-    color: white;
-    padding: 25px;
-    border-radius: 15px;
-    font-size: 20px;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 20px;
-    transition: transform 0.3s;
-}
-
-.btn-pay:hover {
-    transform: translateY(-2px);
-}
-
-.pay-amount {
-    background: rgba(255, 255, 255, 0.2);
-    padding: 8px 15px;
-    border-radius: 10px;
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.deposit-history {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
-    padding: 20px;
-}
-
-.deposit-history h4 {
-    margin-bottom: 15px;
-    font-size: 16px;
-}
-
-.history-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.history-item:last-child {
-    border-bottom: none;
-}
-
-.history-date {
-    font-size: 14px;
-    color: #8a8a9e;
-}
-
-.history-amount {
-    font-weight: 700;
-    color: #FFD700;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.history-status {
-    font-size: 14px;
-    padding: 5px 10px;
-    border-radius: 10px;
-}
-
-.history-status.success {
-    background: rgba(0, 255, 0, 0.2);
-    color: #00ff00;
-}
-
-/* Уведомления */
-.notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: rgba(0, 0, 0, 0.9);
-    border-left: 4px solid #00ff00;
-    border-radius: 10px;
-    padding: 15px 20px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    z-index: 2000;
-    transform: translateX(150%);
-    transition: transform 0.5s;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.notification.show {
-    transform: translateX(0);
-}
-
-.notification-icon {
-    font-size: 24px;
-    color: #00ff00;
-}
-
-.notification-text {
-    font-weight: 600;
-}
-
-/* Модальные окна */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 3000;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s;
-}
-
-.modal.show {
-    opacity: 1;
-    visibility: visible;
-}
-
-.modal-content {
-    background: #1a1a2e;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 400px;
-    overflow: hidden;
-    transform: scale(0.9);
-    transition: transform 0.3s;
-}
-
-.modal.show .modal-content {
-    transform: scale(1);
-}
-
-.modal-header {
+.deposit-header-container {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    margin-bottom: 20px;
 }
 
-.modal-header h3 {
+/* ===== КНОПКИ УПРАВЛЕНИЯ ЭКРАНАМИ ===== */
+.screen-controls {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 18px;
 }
 
-.modal-close {
-    background: none;
+.btn-screen-back {
+    background: rgba(255, 255, 255, 0.1);
     border: none;
     color: white;
-    font-size: 20px;
-    cursor: pointer;
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 16px;
+    cursor: pointer;
     transition: background 0.3s;
 }
 
-.modal-close:hover {
+.btn-screen-back:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-screen-action {
     background: rgba(255, 255, 255, 0.1);
-}
-
-.modal-body {
-    padding: 20px;
-}
-
-.payment-summary {
-    margin-bottom: 30px;
-}
-
-.payment-item {
+    border: none;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
     display: flex;
-    justify-content: space-between;
-    padding: 15px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
 }
 
-.payment-item:last-child {
-    border-bottom: none;
+.btn-screen-action:hover {
+    background: rgba(255, 255, 255, 0.2);
 }
 
-.payment-label {
-    color: #8a8a9e;
+/* ===== КОНТЕНТ С ОТСТУПАМИ ОТ КНОПОК TELEGRAM ===== */
+.screen-content {
+    height: calc(100vh - 140px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 15px;
+    scrollbar-width: none;
 }
 
-.payment-value {
-    font-weight: 600;
+.screen-content::-webkit-scrollbar {
+    display: none;
 }
 
-.payment-processing {
-    text-align: center;
-    padding: 30px 0;
+/* ===== ИСПРАВЛЕНИЯ ДЛЯ ЭКРАНА ПОПОЛНЕНИЯ ===== */
+.deposit-screen-content {
+    height: calc(100vh - 140px);
+    overflow-y: auto;
+    padding: 0 15px;
 }
 
-.processing-spinner {
-    font-size: 48px;
-    color: #00c6ff;
-    margin-bottom: 20px;
-}
-
-.payment-processing p {
-    color: #8a8a9e;
-}
-
-/* Адаптивность */
-@media (max-width: 480px) {
-    .balance-card {
-        min-width: 120px;
-    }
-    
-    .multiplier-value {
-        font-size: 28px;
-    }
-    
-    .rocket {
-        font-size: 60px;
-    }
-    
-    .amount-input input {
-        font-size: 36px;
-        width: 120px;
-    }
-    
-    .amount-label {
-        font-size: 20px;
-    }
-    
-    .profile-stats-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .balance-stats {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .amount-presets {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Прокрутка */
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-
-::-webkit-scrollbar-track {
+/* ===== ОБЩИЕ ИСПРАВЛЕНИЯ ===== */
+.balance-card {
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 12px 15px;
+    text-align: center;
+    min-width: 140px;
 }
 
-::-webkit-scrollbar-thumb {
-    background: rgba(0, 198, 255, 0.5);
-    border-radius: 3px;
+.bet-controls, .game-history, .profile-container, .top-container, .deposit-container {
+    margin: 0 15px 15px;
+    touch-action: none;
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 198, 255, 0.7);
+/* Запрет выделения текста и перетаскивания */
+.no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.no-drag {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+}
+
+/* ===== АДАПТИВНОСТЬ ===== */
+@media (max-width: 380px) {
+    .bottom-nav {
+        min-width: 250px;
+    }
+    
+    .nav-item {
+        padding: 8px 15px;
+        min-width: 70px;
+    }
+    
+    .nav-icon {
+        font-size: 18px;
+    }
+    
+    .nav-label {
+        font-size: 10px;
+    }
+}
+
+/* Отключаем любые возможности скролла на элементах */
+.game-container, .bet-controls, .profile-actions, .top-list {
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
 }
